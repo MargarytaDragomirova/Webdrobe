@@ -1,0 +1,96 @@
+@model WebApplication1.Models.Cloth
+
+@{
+    ViewData["Title"] = "Add New Cloth";
+}
+
+<div class="container mt-5" style="max-width: 650px;">
+    <h2 class="text-center mb-4 fw-bold">👕 Add New Cloth</h2>
+
+    <form asp-action="Create" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label fw-semibold">Name</label>
+            <input asp-for="Name" class="form-control" placeholder="e.g. Denim Jacket" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <!-- CATEGORY DROPDOWN -->
+        <div class="mb-3">
+            <label asp-for="Category" class="form-label fw-semibold">Category</label>
+            <select asp-for="Category" class="form-select">
+                <option value="">-- Select Category --</option>
+                <option>Jacket</option>
+                <option>T-Shirt</option>
+                <option>Shirt</option>
+                <option>Pants</option>
+                <option>Shorts</option>
+                <option>Dress</option>
+                <option>Skirt</option>
+                <option>Sweater</option>
+                <option>Coat</option>
+                <option>Shoes</option>
+                <option>Accessory</option>
+            </select>
+            <span asp-validation-for="Category" class="text-danger"></span>
+        </div>
+
+        <!-- COLOR DROPDOWN -->
+        <div class="mb-3">
+            <label asp-for="Color" class="form-label fw-semibold">Color</label>
+            <select asp-for="Color" class="form-select">
+                <option value="">-- Select Color --</option>
+                <option>Black</option>
+                <option>White</option>
+                <option>Blue</option>
+                <option>Red</option>
+                <option>Green</option>
+                <option>Yellow</option>
+                <option>Beige</option>
+                <option>Gray</option>
+                <option>Pink</option>
+                <option>Purple</option>
+                <option>Brown</option>
+            </select>
+            <span asp-validation-for="Color" class="text-danger"></span>
+        </div>
+
+        <!-- SEASON DROPDOWN -->
+        <div class="mb-3">
+            <label asp-for="Season" class="form-label fw-semibold">Season</label>
+            <select asp-for="Season" class="form-select">
+                <option value="">-- Select Season --</option>
+                <option>Summer</option>
+                <option>Winter</option>
+                <option>Spring</option>
+                <option>Autumn</option>
+                <option>All Seasons</option>
+            </select>
+            <span asp-validation-for="Season" class="text-danger"></span>
+        </div>
+
+        <!-- LOCATION TEXT FIELD -->
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Location</label>
+            <input type="text" name="Location" class="form-control" placeholder="e.g. Closet, Laundry, Suitcase" />
+        </div>
+
+        <!-- IMAGE UPLOAD -->
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Upload Images (max 10)</label>
+            <input type="file" name="imageFiles" class="form-control" multiple accept="image/*" />
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-save"></i> Save Cloth
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

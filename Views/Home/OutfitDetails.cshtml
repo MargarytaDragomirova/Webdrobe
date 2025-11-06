@@ -1,0 +1,37 @@
+@model IEnumerable<WebApplication1.Models.Cloth>
+
+@{
+    ViewData["Title"] = ViewBag.OutfitName;
+}
+
+<div class="container mt-5">
+    <h1 class="fw-bold mb-4">@ViewBag.OutfitName</h1>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning text-center">No clothes found in this outfit.</div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var cloth in Model)
+            {
+                var image = cloth.ImagePaths?.FirstOrDefault() ?? "/images/no-image.png";
+                <div class="col-md-4">
+                    <div class="card shadow-sm text-center">
+                        <img src="@image" class="card-img-top" style="height: 250px; object-fit: cover;" />
+                        <div class="card-body">
+                            <h5>@cloth.Name</h5>
+                            <p>@cloth.Category - @cloth.Color</p>
+                            <p><strong>Location:</strong> @cloth.Location</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="mt-4">
+        <a asp-action="Outfits" class="btn btn-outline-secondary">Back to Outfits</a>
+    </div>
+</div>

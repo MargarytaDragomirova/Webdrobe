@@ -1,0 +1,97 @@
+@model IEnumerable<WebApplication1.Models.Cloth>
+
+@{
+    ViewData["Title"] = "My Wardrobe";
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold">My Wardrobe</h1>
+
+        <div class="d-flex gap-3">
+            <input id="searchInput"
+                   type="text"
+                   class="form-control"
+                   placeholder="Search clothes..."
+                   style="width: 250px;" />
+
+            <a asp-controller="Home" asp-action="Create" class="btn btn-success btn-lg">
+                <i class="bi bi-plus-circle"></i> Add New Cloth
+            </a>
+        </div>
+    </div>
+
+    <div id="clothesList" class="row g-4">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var item in Model)
+            {
+                var imagePath = (item.ImagePaths != null && item.ImagePaths.Any())
+                    ? item.ImagePaths.First()
+                    : "/images/no-image.png"; // fallback
+
+                if (!imagePath.StartsWith("/images/") && !imagePath.StartsWith("http"))
+                {
+                    imagePath = "/images/" + imagePath;
+                }
+
+                <div class="col-md-3 col-sm-6">
+                    <div class="card h-100 shadow-sm border-0 cloth-card"
+                         style="cursor:pointer;"
+                         onclick="window.location='@Url.Action("Details", "Home", new { id = item.Id })'">
+
+                        <div class="position-relative">
+                            <img src="@imagePath"
+                                 class="card-img-top rounded-top"
+                                 style="height:220px; object-fit:cover;"
+                                 alt="@item.Name" />
+
+                            @if (item.ImagePaths?.Count > 1)
+                            {
+                                <span class="badge bg-secondary position-absolute top-0 end-0 m-2">
+                                    +@item.ImagePaths.Count
+                                </span>
+                            }
+                        </div>
+
+                        <div class="card-body text-center">
+                            <h5 class="fw-bold">@item.Name</h5>
+                            <p class="text-muted mb-1">@item.Category</p>
+                            <p class="text-muted mb-0">@item.Color</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-center text-muted mt-5">No clothes found in your wardrobe yet.</p>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const searchInput = document.getElementById("searchInput");
+
+        searchInput.addEventListener("input", async () => {
+            const query = searchInput.value.trim();
+
+            const response = await fetch(`/Home/Search?query=${encodeURIComponent(query)}`);
+            const html = await response.text();
+
+            document.getElementById("clothesList").innerHTML = html;
+        });
+    </script>
+
+    <style>
+        .cloth-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .cloth-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+    </style>
+}

@@ -1,0 +1,81 @@
+@{
+    ViewData["Title"] = "Categories";
+    var clothes = ViewBag.AllClothes as List<WebApplication1.Models.Cloth>;
+    var selected = ViewBag.SelectedCategory as string;
+}
+
+<h2 class="mb-4 text-center">Clothing Categories</h2>
+
+<div class="row text-center mb-4">
+    <!-- Topwear -->
+    <div class="col-md-4">
+        <h4>Topwear</h4>
+        <div class="list-group">
+            <a asp-action="Categories" asp-route-selectedCategory="Jacket" class="list-group-item list-group-item-action @(selected == "Jacket" ? "active" : "")">Jacket</a>
+            <a asp-action="Categories" asp-route-selectedCategory="T-Shirt" class="list-group-item list-group-item-action @(selected == "T-Shirt" ? "active" : "")">T-Shirt</a>
+            <a asp-action="Categories" asp-route-selectedCategory="Shirt" class="list-group-item list-group-item-action @(selected == "Shirt" ? "active" : "")">Shirt</a>
+            <a asp-action="Categories" asp-route-selectedCategory="Sweater" class="list-group-item list-group-item-action @(selected == "Sweater" ? "active" : "")">Sweater</a>
+            <a asp-action="Categories" asp-route-selectedCategory="Coat" class="list-group-item list-group-item-action @(selected == "Coat" ? "active" : "")">Coat</a>
+        </div>
+    </div>
+
+    <!-- Bottomwear -->
+    <div class="col-md-4">
+        <h4>Bottomwear</h4>
+        <div class="list-group">
+            <a asp-action="Categories" asp-route-selectedCategory="Pants" class="list-group-item list-group-item-action @(selected == "Pants" ? "active" : "")">Pants</a>
+            <a asp-action="Categories" asp-route-selectedCategory="Shorts" class="list-group-item list-group-item-action @(selected == "Shorts" ? "active" : "")">Shorts</a>
+            <a asp-action="Categories" asp-route-selectedCategory="Skirt" class="list-group-item list-group-item-action @(selected == "Skirt" ? "active" : "")">Skirt</a>
+            <a asp-action="Categories" asp-route-selectedCategory="Dress" class="list-group-item list-group-item-action @(selected == "Dress" ? "active" : "")">Dress</a>
+        </div>
+    </div>
+
+    <!-- Other -->
+    <div class="col-md-4">
+        <h4>Other</h4>
+        <div class="list-group">
+            <a asp-action="Categories" asp-route-selectedCategory="Shoes" class="list-group-item list-group-item-action @(selected == "Shoes" ? "active" : "")">Shoes</a>
+            <a asp-action="Categories" asp-route-selectedCategory="Accessory" class="list-group-item list-group-item-action @(selected == "Accessory" ? "active" : "")">Accessory</a>
+        </div>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(selected))
+{
+    <h3 class="mt-4 mb-3 text-center">@selected Items</h3>
+
+    @if (clothes != null && clothes.Any())
+    {
+        <div class="row">
+            @foreach (var item in clothes)
+            {
+                <div class="col-md-3 mb-4">
+                    <div class="card shadow-sm">
+                        @if (item.ImagePaths != null && item.ImagePaths.Any())
+                        {
+                            <img src="@Url.Content(item.ImagePaths.First())" class="card-img-top" alt="@item.Name" style="height:200px;object-fit:cover;">
+                        }
+                        else
+                        {
+                            <img src="~/images/no-image.png" class="card-img-top" alt="No Image" style="height:200px;object-fit:cover;">
+                        }
+                        <div class="card-body text-center">
+                            <h6>@item.Name</h6>
+                            <p class="text-muted mb-1">@item.Color</p>
+                            <p class="text-muted mb-1">@item.Season</p>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary btn-sm mt-2">Details</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-center text-muted">No items found in this category.</p>
+    }
+}
+else
+{
+    <p class="text-center text-muted">Select a category to see your clothes.</p>
+}

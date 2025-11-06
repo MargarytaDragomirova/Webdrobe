@@ -1,0 +1,63 @@
+@model WebApplication1.Models.Cloth
+
+@{
+    ViewData["Title"] = "Delete Cloth";
+}
+
+<div class="container mt-5 text-center">
+    <h2>Are you sure you want to delete this item?</h2>
+    <hr />
+
+    <div class="card mx-auto shadow-lg" style="width: 20rem;">
+        @if (Model.ImagePaths != null && Model.ImagePaths.Any())
+        {
+            <div id="clothCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    @for (int i = 0; i < Model.ImagePaths.Count; i++)
+                    {
+                        var imagePath = Model.ImagePaths[i];
+                        // Fix for images saved in wwwroot/images/
+                        if (!imagePath.StartsWith("/images/") && !imagePath.StartsWith("http"))
+                        {
+                            imagePath = "/images/" + imagePath;
+                        }
+
+                        <div class="carousel-item @(i == 0 ? "active" : "")">
+                            <img src="@imagePath"
+                                 class="d-block w-100 rounded-top"
+                                 style="height:250px; object-fit:cover;"
+                                 alt="Cloth image @(i + 1)" />
+                        </div>
+                    }
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#clothCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#clothCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        }
+        else
+        {
+            <div class="p-3">
+                <p class="text-muted">No images available.</p>
+            </div>
+        }
+
+        <div class="card-body">
+            <h5 class="card-title">@Model.Name</h5>
+            <p class="card-text mb-1"><strong>Category:</strong> @Model.Category</p>
+            <p class="card-text mb-1"><strong>Color:</strong> @Model.Color</p>
+            <p class="card-text mb-1"><strong>Season:</strong> @Model.Season</p>
+        </div>
+    </div>
+
+    <form asp-action="Delete" method="post" class="mt-4">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger px-4">Delete</button>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary px-4 ms-2">Cancel</a>
+    </form>
+</div>

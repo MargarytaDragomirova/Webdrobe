@@ -1,0 +1,79 @@
+@model WebApplication1.Models.Outfit
+@{
+    ViewData["Title"] = "Edit Outfit";
+    var clothes = ViewBag.Clothes as List<WebApplication1.Models.Cloth> ?? new List<WebApplication1.Models.Cloth>();
+}
+
+<h2 class="mb-3">Edit Outfit</h2>
+
+<form asp-action="EditOutfit" asp-route-id="@Model.Id" method="post">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">Outfit Name</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Select Clothes (at least 2)</label>
+
+        <div class="d-flex flex-wrap gap-3">
+            @foreach (var cloth in clothes)
+            {
+                // safe check for ImagePaths
+                var imageUrl = (cloth.ImagePaths != null && cloth.ImagePaths.Count > 0)
+                    ? cloth.ImagePaths[0]
+                    : "/images/no-image.png";
+
+                var isChecked = Model.ClothIds != null && Model.ClothIds.Contains(cloth.Id);
+
+                <div class="border rounded p-2 text-center" style="width:140px;">
+                    <img src="@imageUrl"
+                         alt="@cloth.Name"
+                         style="width:120px;height:100px;object-fit:cover;border-radius:8px;" />
+
+                    <div class="form-check mt-2">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               name="selectedClothIds"
+                               value="@cloth.Id"
+                               id="cloth_@cloth.Id"
+                               @(isChecked ? "checked" : "") />
+                        <label class="form-check-label small" for="cloth_@cloth.Id">@cloth.Name</label>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="text-danger mt-2">
+            @if (!ViewData.ModelState.IsValid)
+            {
+                foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <div>@err.ErrorMessage</div>
+                }
+            }
+        </div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-success">Save Changes</button>
+        <a asp-action="Outfits" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        // client-side guard: ensure at least 2 selected
+        document.querySelector("form").addEventListener("submit", function (e) {
+            const count = document.querySelectorAll("input[name='selectedClothIds']:checked").length;
+            if (count < 2) {
+                alert("Please select at least 2 clothing items for an outfit.");
+                e.preventDefault();
+            }
+        });
+    </script>
+}

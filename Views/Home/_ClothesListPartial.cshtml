@@ -1,0 +1,62 @@
+@model IEnumerable<WebApplication1.Models.Cloth>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info text-center mt-4">
+        No clothes found matching your search.
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var cloth in Model)
+        {
+            var firstImage = (cloth.ImagePaths != null && cloth.ImagePaths.Any())
+                ? cloth.ImagePaths.First()
+                : "/images/no-image.png";
+
+            if (!firstImage.StartsWith("/images/") && !firstImage.StartsWith("http"))
+            {
+                firstImage = "/images/" + firstImage;
+            }
+
+            <div class="col-md-3 col-sm-6">
+                <div class="card h-100 shadow-sm border-0 cloth-card"
+                     style="cursor:pointer;"
+                     onclick="window.location='@Url.Action("Details", "Home", new { id = cloth.Id })'">
+
+                    <div class="position-relative">
+                        <img src="@firstImage"
+                             class="card-img-top rounded-top"
+                             style="height:220px; object-fit:cover;"
+                             alt="@cloth.Name" />
+
+                        @if (cloth.ImagePaths?.Count > 1)
+                        {
+                            <span class="badge bg-secondary position-absolute top-0 end-0 m-2">
+                                +@cloth.ImagePaths.Count
+                            </span>
+                        }
+                    </div>
+
+                    <div class="card-body text-center">
+                        <h5 class="fw-bold">@cloth.Name</h5>
+                        <p class="text-muted mb-1">@cloth.Category</p>
+                        <p class="text-muted mb-0">@cloth.Color</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<style>
+    .cloth-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .cloth-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+</style>
