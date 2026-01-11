@@ -10,10 +10,8 @@ namespace WebApplication1.Models
         [Required]
         public string Name { get; set; } = string.Empty;
 
-        // Store cloth IDs (e.g., [3, 5, 10]) as JSON text
         public string ClothIdsJson { get; set; } = string.Empty;
 
-        // Not mapped property to easily access the IDs as a list
         [NotMapped]
         public List<int> ClothIds
         {
@@ -22,5 +20,7 @@ namespace WebApplication1.Models
                 : System.Text.Json.JsonSerializer.Deserialize<List<int>>(ClothIdsJson)!;
             set => ClothIdsJson = System.Text.Json.JsonSerializer.Serialize(value);
         }
+
+        public List<Cloth>? Cloths {get;set;} = [];
     }
 }

@@ -77,6 +77,235 @@ namespace WebApplication1.Controllers
             return View(cloth);
         }
 
+        // GET: /Home/GetClothes
+        public async Task<List<Cloth>> GetClothes()
+        {
+            var clothes = await _context.Clothes.ToListAsync();
+            return clothes;
+        }
+
+        [HttpGet("GetCloth/{id}")]
+        public async Task<IActionResult> GetCloth(int id)
+        {
+            var cloth = await _context.Clothes.FindAsync(id);
+            if (cloth == null)
+                return NotFound(new { message = "Cloth not found" });
+
+            return Ok(cloth);
+        }
+
+        [HttpPut("UpdateCloth/{id}")]
+        public async Task<IActionResult> UpdateCloth(int id, [FromForm] Cloth clothUpdate, List<IFormFile>? imageFiles)
+        {
+            var cloth = await _context.Clothes.FindAsync(id);
+            if (cloth == null)
+                return NotFound("Cloth not found");
+
+            cloth.Name = clothUpdate.Name;
+            cloth.Category = clothUpdate.Category;
+            cloth.Color = clothUpdate.Color;
+            cloth.Season = clothUpdate.Season;
+            cloth.Location = clothUpdate.Location;
+
+            // handle new images
+            if (imageFiles != null && imageFiles.Any())
+            {
+                string uploadsFolder = Path.Combine(_env.WebRootPath, "images", "clothes");
+                Directory.CreateDirectory(uploadsFolder);
+
+                var newPaths = new List<string>();
+
+                foreach (var file in imageFiles.Take(10))
+                {
+                    string fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+                    string filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    newPaths.Add($"/images/clothes/{fileName}");
+                }
+
+                cloth.ImagePaths = newPaths;
+            }
+
+            _context.Update(cloth);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, cloth });
+        }
+
+
+        [HttpDelete]
+        public async Task<string> DeleteCloth(int id)
+        {
+            var cloth = await _context.Clothes.FindAsync(id);
+            if (cloth != null)
+            {
+                _context.Clothes.Remove(cloth);
+                await _context.SaveChangesAsync();
+                return "Cloth " + cloth.Name + " deleted";
+            }
+            return "Cloth not found";
+        }
+
+
+
+        [HttpGet("GetOutfits")]
+        public async Task<List<Outfit>> GetOutfitsApi()
+        {
+            var outfits = await _context.Outfits.ToListAsync();
+            foreach (var item in outfits)
+            {
+                foreach (var clothId in item.ClothIds)
+                {
+                    var cloth = await _context.Clothes.FirstOrDefaultAsync(x=> x.Id == clothId);
+                    if (cloth != null)
+                    {
+                        item.Cloths ??= [];
+                        item.Cloths.Add(cloth);
+                    }
+                }
+                _ = _context.Outfits.Update(item);
+            }
+            return outfits;
+        }
+
+        [HttpGet("GetOutfit/{id}")]
+        public async Task<IActionResult> GetOutfitApi(int id)
+        {
+            var outfit = await _context.Outfits.FindAsync(id);
+            if (outfit == null)
+                return NotFound();
+
+            var clothes = await _context.Clothes
+                .Where(c => outfit.ClothIds.Contains(c.Id))
+                .ToListAsync();
+
+            return Ok(new
+            {
+                outfit.Id,
+                outfit.Name,
+                Clothes = clothes
+            });
+        }
+
+        [HttpPost("CreateOutfitApi")]
+        public async Task<IActionResult> CreateOutfitApi([FromBody] Outfit outfit)
+        {
+            if (string.IsNullOrWhiteSpace(outfit.Name) || outfit.ClothIds.Count < 2)
+                return BadRequest("Outfit must contain at least 2 items.");
+
+            _context.Outfits.Add(outfit);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, outfit });
+        }
+
+        [HttpPut("UpdateOutfit/{id}")]
+        public async Task<IActionResult> UpdateOutfit(int id, [FromBody] Outfit update)
+        {
+            var outfit = await _context.Outfits.FindAsync(id);
+            if (outfit == null)
+                return NotFound();
+
+            outfit.Name = update.Name;
+            outfit.ClothIds = update.ClothIds;
+
+            _context.Update(outfit);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, outfit });
+        }
+
+        [HttpDelete("DeleteOutfitApi/{id}")]
+        public async Task<IActionResult> DeleteOutfitApi(int id)
+        {
+            var outfit = await _context.Outfits.FindAsync(id);
+            if (outfit == null)
+                return NotFound();
+
+            _context.Outfits.Remove(outfit);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true });
+        }
+
+        [HttpGet("FilterClothes")]
+        public async Task<IActionResult> FilterClothes(string? category, string? color, string? season, string? location)
+        {
+            var query = _context.Clothes.AsQueryable();
+
+            if (!string.IsNullOrEmpty(category))
+                query = query.Where(c => c.Category == category);
+
+            if (!string.IsNullOrEmpty(color))
+                query = query.Where(c => c.Color == color);
+
+            if (!string.IsNullOrEmpty(season))
+                query = query.Where(c => c.Season == season);
+
+            if (!string.IsNullOrEmpty(location))
+                query = query.Where(c => c.Location == location);
+
+            return Ok(await query.ToListAsync());
+        }
+
+
+
+
+
+
+
+
+
+      [HttpPost("CreateCloth")]
+        public async Task<IActionResult> CreateCloth([FromForm] Cloth cloth, List<IFormFile>? imageFiles)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid data");
+
+            var imagePaths = new List<string>();
+
+            if (imageFiles != null && imageFiles.Any())
+            {
+                string uploadsFolder = Path.Combine(_env.WebRootPath, "images", "clothes");
+                Directory.CreateDirectory(uploadsFolder);
+
+                foreach (var imageFile in imageFiles.Take(10)) // limit to 10 images
+                {
+                    if (imageFile.Length > 0)
+                    {
+                        string uniqueFileName = Guid.NewGuid() + Path.GetExtension(imageFile.FileName);
+                        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await imageFile.CopyToAsync(fileStream);
+                        }
+
+                        imagePaths.Add($"/images/clothes/{uniqueFileName}");
+                    }
+                }
+            }
+
+            cloth.ImagePaths = imagePaths;
+
+            _context.Clothes.Add(cloth);
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                success = true,
+                message = $"Cloth '{cloth.Name}' created successfully",
+                cloth
+            });
+        }
+
+        
+
         // POST: /Home/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
