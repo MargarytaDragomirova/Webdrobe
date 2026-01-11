@@ -1,4 +1,7 @@
+@using Microsoft.AspNetCore.Identity
 @model IEnumerable<WebApplication1.Models.Cloth>
+@inject SignInManager<IdentityUser> SignInManager
+
 
 @{
     ViewData["Title"] = "My Wardrobe";
@@ -9,15 +12,19 @@
         <h1 class="fw-bold">My Wardrobe</h1>
 
         <div class="d-flex gap-3">
-            <input id="searchInput"
-                   type="text"
-                   class="form-control"
-                   placeholder="Search clothes..."
-                   style="width: 250px;" />
+            <input id="searchInput" type="text" class="form-control" placeholder="Search clothes..."
+                style="width: 250px;" />
 
-            <a asp-controller="Home" asp-action="Create" class="btn btn-success btn-lg">
-                <i class="bi bi-plus-circle"></i> Add New Cloth
-            </a>
+            @if (SignInManager.IsSignedIn(User))
+            {
+                <a asp-controller="Home" asp-action="Create" class="btn btn-success btn-lg">
+                    <i class="bi bi-plus-circle"></i> Add New Cloth
+                </a>
+            }
+            else
+            {
+                <a class="btn btn-success btn-lg" asp-area="Identity" asp-page="/Account/Login">Login to Add New Cloth</a>
+            }
         </div>
     </div>
 
@@ -27,8 +34,8 @@
             @foreach (var item in Model)
             {
                 var imagePath = (item.ImagePaths != null && item.ImagePaths.Any())
-                    ? item.ImagePaths.First()
-                    : "/images/no-image.png"; // fallback
+                ? item.ImagePaths.First()
+                : "/images/no-image.png"; // fallback
 
                 if (!imagePath.StartsWith("/images/") && !imagePath.StartsWith("http"))
                 {
@@ -36,15 +43,12 @@
                 }
 
                 <div class="col-md-3 col-sm-6">
-                    <div class="card h-100 shadow-sm border-0 cloth-card"
-                         style="cursor:pointer;"
-                         onclick="window.location='@Url.Action("Details", "Home", new { id = item.Id })'">
+                    <div class="card h-100 shadow-sm border-0 cloth-card" style="cursor:pointer;"
+                        onclick="window.location='@Url.Action("Details", "Home", new { id = item.Id })'">
 
                         <div class="position-relative">
-                            <img src="@imagePath"
-                                 class="card-img-top rounded-top"
-                                 style="height:220px; object-fit:cover;"
-                                 alt="@item.Name" />
+                            <img src="@imagePath" class="card-img-top rounded-top" style="height:220px; object-fit:cover;"
+                                alt="@item.Name" />
 
                             @if (item.ImagePaths?.Count > 1)
                             {
@@ -91,7 +95,7 @@
 
         .cloth-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
     </style>
 }

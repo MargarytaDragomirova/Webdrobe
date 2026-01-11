@@ -1,4 +1,7 @@
+@using Microsoft.AspNetCore.Identity
 @model IEnumerable<dynamic>
+@inject SignInManager<IdentityUser> SignInManager
+
 
 @{
     ViewData["Title"] = "Outfits";
@@ -7,7 +10,14 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>All Outfits</h2>
-        <a asp-action="CreateOutfit" class="btn btn-success">+ Create New Outfit</a>
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <a asp-action="CreateOutfit" class="btn btn-success">+ Create New Outfit</a>
+        }
+        else
+        {
+            <a class="btn btn-success" asp-area="Identity" asp-page="/Account/Login">Login to Create New Outfit</a>
+        }
     </div>
 
     @if (!Model.Any())
@@ -30,29 +40,24 @@
                                 @foreach (var cloth in item.Clothes)
                                 {
                                     var imageUrl = cloth.ImagePaths != null && cloth.ImagePaths.Count > 0
-                                        ? cloth.ImagePaths[0]
-                                        : "/images/no-image.png"; // fallback image
+                                    ? cloth.ImagePaths[0]
+                                    : "/images/no-image.png"; // fallback image
 
                                     <div class="m-1 text-center">
-                                        <img src="@imageUrl"
-                                             alt="@cloth.Name"
-                                             class="img-thumbnail"
-                                             style="width: 100px; height: 100px; object-fit: cover;" />
+                                        <img src="@imageUrl" alt="@cloth.Name" class="img-thumbnail"
+                                            style="width: 100px; height: 100px; object-fit: cover;" />
                                         <div class="small text-muted">@cloth.Name</div>
                                     </div>
                                 }
                             </div>
 
                             <div class="mt-3 d-flex justify-content-between">
-                                <a asp-action="EditOutfit"
-                                   asp-route-id="@item.Outfit.Id"
-                                   class="btn btn-primary btn-sm">Edit</a>
+                                <a asp-action="EditOutfit" asp-route-id="@item.Outfit.Id"
+                                    class="btn btn-primary btn-sm">Edit</a>
 
-                                <form asp-action="DeleteOutfit"
-                                      asp-route-id="@item.Outfit.Id"
-                                      method="post"
-                                      onsubmit="return confirm('Are you sure you want to delete this outfit?');"
-                                      style="display:inline;">
+                                <form asp-action="DeleteOutfit" asp-route-id="@item.Outfit.Id" method="post"
+                                    onsubmit="return confirm('Are you sure you want to delete this outfit?');"
+                                    style="display:inline;">
                                     <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                 </form>
                             </div>
