@@ -14,7 +14,13 @@ kolayca ulaşabilecektir.
 
 #Bağımlılıkları yükleyin:
 
+```
 dart pub get
+```
 
 #Çalıştırın:
+
+```
 dart run
+```
+
