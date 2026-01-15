@@ -12,7 +12,7 @@ kombinler oluşturabilecek ve arama/filtreleme özellikleri sayesinde istedikler
 kolayca ulaşabilecektir.
 
 
-#Çalıştırın:
+Çalıştırın:
 
 ```
 dotnet run
