@@ -10,3 +10,11 @@ amaçlamaktadır.
 Kullanıcılar, sistem üzerinden kıyafetlerinin konumlarını manuel olarak belirleyebilecek,
 kombinler oluşturabilecek ve arama/filtreleme özellikleri sayesinde istedikleri eşyalara
 kolayca ulaşabilecektir.
+
+
+#Bağımlılıkları yükleyin:
+
+dart pub get
+
+#Çalıştırın:
+dart run
