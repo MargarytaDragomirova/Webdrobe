@@ -12,15 +12,9 @@ kombinler oluşturabilecek ve arama/filtreleme özellikleri sayesinde istedikler
 kolayca ulaşabilecektir.
 
 
-#Bağımlılıkları yükleyin:
-
-```
-dart pub get
-```
-
 #Çalıştırın:
 
 ```
-dart run
+dotnet run
 ```
 
