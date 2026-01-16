@@ -1,3 +1,5 @@
+Google Drive linki: https://drive.google.com/drive/folders/11Mmwb-Hwbz56YdrOjcjuoR433wbRdF96?usp=share_link
+
 # Webdrobe
 
 Proje Amacı ve Kapsamı Günümüzde bireylerin sahip oldukları kıyafet ve eşyaların sayısı
